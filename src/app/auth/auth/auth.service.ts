@@ -7,6 +7,7 @@ import { Router } from "@angular/router";
 import { Store } from "@ngrx/store";
 import * as fromApp from '../../store/app.reducer'
 import * as AuthActions from "./store/auth.actions";
+import { environment } from '../../../environments/environment'
 
 interface AuthResponseData {
     idToken: string,
@@ -25,7 +26,7 @@ export class AuthService {
     constructor(private http: HttpClient, private router: Router, private store: Store<fromApp.AppState>) { }
 
     signup(email: string, password: string) {
-        return this.http.post<AuthResponseData>('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAroNNDkHTvO0aeQ4i4IkJQE_Vqzmvrh5Y',
+        return this.http.post<AuthResponseData>('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + environment.firebaseAPIkey,
             { email: email, password: password, returnSecureToken: true }).pipe(catchError(this.handleError), tap(resData => {
                 const expirationDate = new Date(new Date().getTime() + +resData.expiresIn * 1000)
                 const user = new User(resData.email, resData.localId, resData.idToken, expirationDate)
@@ -34,7 +35,7 @@ export class AuthService {
             }))
     }
     login(email: string, password: string) {
-        return this.http.post<AuthResponseData>('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAroNNDkHTvO0aeQ4i4IkJQE_Vqzmvrh5Y',
+        return this.http.post<AuthResponseData>('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + environment.firebaseAPIkey,
             { email: email, password: password, returnSecureToken: true }).pipe(catchError(this.handleError), tap(resData => {
                 const expirationDate = new Date(new Date().getTime() + +resData.expiresIn * 1000)
                 const user = new User(resData.email, resData.localId, resData.idToken, expirationDate)
